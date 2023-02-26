@@ -1,5 +1,6 @@
 package com.example.quiz.User;
 
+import com.example.quiz.Quiz.Quiz;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,7 +35,14 @@ public class User implements UserDetails {
     private Role role;
     private Boolean is_enabled;
     private Boolean is_blocked;
-
+    @OneToMany(
+            mappedBy = "creator"
+    )
+    private List<Quiz> user_quizzes;
+    //TODO: private VerificationToken verification_token
+    //TODO: private List<User> followed_users
+    //TODO: private List<QuizRecord> quiz_history
+    //TODO: private List<SearchQuery> search_history
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
@@ -69,9 +77,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return is_enabled;
     }
-    //TODO: private List<Quiz> user_quizzes
-    //TODO: private VerificationToken verification_token
-    //TODO: private List<User> followed_users
-    //TODO: private List<QuizRecord> quiz_history
-    //TODO: private List<SearchQuery> search_history
+
+
 }
