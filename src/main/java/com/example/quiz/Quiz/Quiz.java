@@ -1,8 +1,8 @@
 package com.example.quiz.Quiz;
 
-import com.example.quiz.Quiz.DTO.AnswerDTO;
 import com.example.quiz.Quiz.DTO.QuestionDTO;
-import com.example.quiz.Quiz.DTO.QuizDTO;
+import com.example.quiz.Quiz.DTO.QuizDisplayDTO;
+import com.example.quiz.Quiz.DTO.QuizInfoDTO;
 import com.example.quiz.Quiz.Question.Question;
 import com.example.quiz.User.User;
 import jakarta.persistence.*;
@@ -34,13 +34,21 @@ public class Quiz {
     @ManyToOne
     private User creator;
 
-    public QuizDTO createDTO() {
+    public QuizDisplayDTO createDisplayDTO() {
         List<QuestionDTO> questionDTOs = new ArrayList<>();
         questions.forEach(question->{
             questionDTOs.add(question.createDTO());
         });
 
-        return QuizDTO.builder().name(quiz_name).questions(questionDTOs).build();
+        return QuizDisplayDTO.builder().name(quiz_name).questions(questionDTOs).build();
 
+    }
+    public QuizInfoDTO createInfoDTO(){
+        return QuizInfoDTO.builder()
+                .creator_username(creator.getUsername())
+                .quiz_name(quiz_name)
+                .id(id)
+                .question_amount(questions.size())
+                .build();
     }
 }
