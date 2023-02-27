@@ -2,7 +2,7 @@ package com.example.quiz.Security.Authentication;
 
 import com.example.quiz.Security.Authentication.DTO.AuthenticationRequest;
 import com.example.quiz.Security.Authentication.DTO.AuthenticationResponse;
-import com.example.quiz.Security.Authentication.DTO.RegistrationResponse;
+import com.example.quiz.Security.Authentication.DTO.RegistrationRequest;
 import com.example.quiz.Security.Authentication.DTO.RegistrationResult;
 import com.example.quiz.Security.JWT.JwtService;
 import com.example.quiz.User.Role;
@@ -25,7 +25,7 @@ public class AuthenticationService {
 
     private final AuthenticationManager authentication_manager;
 
-    public RegistrationResult registerUser(RegistrationResponse request) {
+    public RegistrationResult registerUser(RegistrationRequest request) {
         boolean login_conflict = user_service.loginExists(request.login());
         boolean email_conflict = user_service.emailExists(request.email());
 
