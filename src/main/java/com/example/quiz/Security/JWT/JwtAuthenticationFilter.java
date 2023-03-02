@@ -33,6 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String  auth_header = request.getHeader("Authorization");
         final String jwt;
         final String username;
+
         if(auth_header == null ){
             filterChain.doFilter(request,response);
             return;

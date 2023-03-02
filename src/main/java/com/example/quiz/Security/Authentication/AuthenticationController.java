@@ -6,13 +6,14 @@ import com.example.quiz.Security.Authentication.DTO.RegistrationRequest;
 import com.example.quiz.Security.Authentication.DTO.RegistrationResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
-@RequestMapping("/api/user/auth")
+@RequestMapping(path = "/api/user/auth",consumes = {"application/json"})
 public class AuthenticationController {
 
     private final AuthenticationService authentication_service;
