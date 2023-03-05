@@ -3,6 +3,7 @@ package com.example.quiz.Quiz;
 import com.example.quiz.Quiz.DTO.CreateQuizRequest;
 import com.example.quiz.Quiz.DTO.QuizDisplayDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class QuizController {
     private final QuizService quiz_service;
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/create")
     public QuizDisplayDTO createNewQuiz(@RequestBody CreateQuizRequest request){
         return quiz_service.createQuiz(request);

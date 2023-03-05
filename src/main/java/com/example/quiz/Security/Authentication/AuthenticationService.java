@@ -4,6 +4,9 @@ import com.example.quiz.Security.Authentication.DTO.AuthenticationRequest;
 import com.example.quiz.Security.Authentication.DTO.AuthenticationResponse;
 import com.example.quiz.Security.Authentication.DTO.RegistrationRequest;
 import com.example.quiz.Security.Authentication.DTO.RegistrationResult;
+import com.example.quiz.Security.Authentication.Exceptions.EmailTakenException;
+import com.example.quiz.Security.Authentication.Exceptions.LoginTakenException;
+import com.example.quiz.Security.Authentication.Exceptions.PasswordMissmatchException;
 import com.example.quiz.Security.JWT.JwtService;
 import com.example.quiz.User.Role;
 import com.example.quiz.User.User;
@@ -30,17 +33,15 @@ public class AuthenticationService {
         boolean email_conflict = user_service.emailExists(request.email());
 
         if(login_conflict){
-            System.out.println("Login");
-            return new RegistrationResult(false,Optional.empty());
+            throw new LoginTakenException();
         }
 
         if(email_conflict){
-            System.out.println("Email");
-            return new RegistrationResult(false,Optional.empty());
+            throw new EmailTakenException();
         }
 
         if (!request.password().equals(request.match_password())){
-            return new RegistrationResult(false,Optional.empty());
+            throw new PasswordMissmatchException();
         }
 
         User new_user = User.builder()
@@ -54,7 +55,7 @@ public class AuthenticationService {
         user_service.reqisterNewUser(new_user);
 
 
-        return new RegistrationResult(true, Optional.of(jwt_service.generateToken(new_user)));
+        return new RegistrationResult(jwt_service.generateToken(new_user));
     }
     public AuthenticationResponse authenticate(AuthenticationRequest request){
         authentication_manager.authenticate(

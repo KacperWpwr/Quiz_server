@@ -35,7 +35,7 @@ public class SecurityConfig {
         http.cors().and()
                 .csrf().disable()
                 .authorizeHttpRequests(authorize-> authorize
-                        .requestMatchers("/api/user/auth/**").permitAll()
+                        .requestMatchers("/api/user/auth/**","/api/quiz/get/**","/api/quiz/search/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authenticationProvider(getAuthenticationProvider())
