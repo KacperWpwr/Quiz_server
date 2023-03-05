@@ -1,8 +1,8 @@
 package com.example.quiz.Security.Authentication;
 
-import com.example.quiz.Security.Authentication.Exceptions.EmailTakenException;
-import com.example.quiz.Security.Authentication.Exceptions.LoginTakenException;
-import com.example.quiz.Security.Authentication.Exceptions.PasswordMissmatchException;
+import com.example.quiz.AppExceptions.AppException;
+import com.example.quiz.AppExceptions.ExceptionResponseEntity;
+import com.example.quiz.Security.Authentication.Exceptions.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,21 +13,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class AuthenticationExceptionHandler extends ResponseEntityExceptionHandler {
-    @ExceptionHandler( value = {LoginTakenException.class})
-    protected ResponseEntity<Object> handleLoginTaken(LoginTakenException exception, WebRequest request){
-        String body="Given login already exists";
-        return handleExceptionInternal(exception,body,new HttpHeaders(), HttpStatus.valueOf(425),request);
+    @ExceptionHandler( value = {LoginTakenException.class,PasswordMissmatchException.class,EmailTakenException.class,
+            InvalidLoginException.class,InvalidPasswordException.class})
+    protected ResponseEntity<Object> handleLoginTaken(AppException exception, WebRequest request){
+        return handleExceptionInternal(exception,exception.getResponseEntity(),new HttpHeaders(), HttpStatus.valueOf(409),request);
     }
 
-    @ExceptionHandler(value = {PasswordMissmatchException.class})
-    protected ResponseEntity<Object> handlePassworMissmatch(PasswordMissmatchException exception, WebRequest request){
-        String body="Given password's are not identical";
-        return handleExceptionInternal(exception,body,new HttpHeaders(), HttpStatus.valueOf(426),request);
-    }
 
-    @ExceptionHandler(value = {EmailTakenException.class})
-    protected ResponseEntity<Object> handleEmailTaken(EmailTakenException exception, WebRequest request){
-        String body="Email is already taken";
-        return handleExceptionInternal(exception,body,new HttpHeaders(), HttpStatus.valueOf(427),request);
-    }
 }
+

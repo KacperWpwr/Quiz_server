@@ -1,5 +1,7 @@
 package com.example.quiz.Security.Authentication.Exceptions;
 
-public class EmailTakenException extends RuntimeException{
-    public EmailTakenException() {super();}
+import com.example.quiz.AppExceptions.AppException;
+
+public class EmailTakenException extends AppException {
+    public EmailTakenException() {super("Email is already taken",427);}
 }

@@ -1,5 +1,7 @@
 package com.example.quiz.Security.Authentication.Exceptions;
 
-public class PasswordMissmatchException extends RuntimeException{
-    public PasswordMissmatchException() {super();}
+import com.example.quiz.AppExceptions.AppException;
+
+public class PasswordMissmatchException extends AppException {
+    public PasswordMissmatchException() {super("Given passwords are not identical",426);}
 }
