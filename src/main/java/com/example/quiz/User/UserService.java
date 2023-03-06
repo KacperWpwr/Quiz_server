@@ -22,6 +22,9 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(new_user);
     }
+    public User saveUser(User user){
+        return userRepository.save(user);
+    }
 
     @Override
     public User loadUserByUsername(String username)  {
