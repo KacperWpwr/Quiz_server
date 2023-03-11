@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,7 +82,7 @@ public class QuizService {
     }
     public List<QuizInfoDTO> advancedSearch(String query){
         List<Quiz> quizzes= quiz_repository.findAll();
-        String[] sub_queries=query.toLowerCase().split(" ");
+        String[] sub_queries=query.toLowerCase().split("[ ,.]");
         for (int i = 0; i < sub_queries.length; i++) {
             System.out.println(sub_queries[i]);
         }
@@ -97,9 +99,8 @@ public class QuizService {
                 matches.add(new QueryMatch(quiz.getId(),match_level));
             }
         });
+        Collections.sort(matches, (o1, o2) -> Integer.compare(o2.match,o1.match));
 
-        return matches.stream().map(match->{
-            return quiz_repository.findById(match.id).get().createInfoDTO();
-        }).collect(Collectors.toList());
+        return matches.stream().map(match-> quiz_repository.findById(match.id).get().createInfoDTO()).collect(Collectors.toList());
     }
 }

@@ -1,9 +1,7 @@
 package com.example.quiz.Security.Authentication;
 
-import com.example.quiz.Security.Authentication.DTO.AuthenticationRequest;
-import com.example.quiz.Security.Authentication.DTO.AuthenticationResponse;
-import com.example.quiz.Security.Authentication.DTO.RegistrationRequest;
-import com.example.quiz.Security.Authentication.DTO.RegistrationResult;
+import com.example.quiz.Security.Authentication.DTO.*;
+import com.example.quiz.User.DTO.UserAccountInfoDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -25,5 +23,14 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> getAuthentication(@RequestBody AuthenticationRequest request){
         return new ResponseEntity<AuthenticationResponse>(authentication_service.authenticate(request), HttpStatusCode.valueOf(200));
+    }
+
+    @PutMapping("/change/email")
+    public ResponseEntity<EmailChangeResult> changeEmail(@RequestBody EmailChangeRequest request){
+        return new ResponseEntity<>(authentication_service.changePassword(request),HttpStatusCode.valueOf(200));
+    }
+    @PutMapping("/change/login")
+    public ResponseEntity<LoginChangeResult> changeLogin(@RequestBody LoginChangeRequest request){
+        return new ResponseEntity<>(authentication_service.changeLogin(request),HttpStatusCode.valueOf(200));
     }
 }

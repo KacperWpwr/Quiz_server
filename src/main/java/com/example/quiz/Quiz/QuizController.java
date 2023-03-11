@@ -31,8 +31,9 @@ public class QuizController {
     public ResponseEntity<List<QuizInfoDTO>> getQuizByNameStrict(@PathVariable String name){
         return new ResponseEntity<>(quiz_service.strictNameSearch(name), HttpStatusCode.valueOf(200));
     }
-    @GetMapping("/search/advanced")
-    public ResponseEntity<List<QuizInfoDTO>> getQuizByNameAdvanced(@RequestBody String name){
+    @GetMapping("/search/advanced/{name}")
+    public ResponseEntity<List<QuizInfoDTO>> getQuizByNameAdvanced(@PathVariable String name){
         return new ResponseEntity<>(quiz_service.advancedSearch(name),HttpStatusCode.valueOf(200));
     }
+
 }

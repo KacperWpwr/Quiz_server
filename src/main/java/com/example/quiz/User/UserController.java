@@ -1,19 +1,25 @@
 package com.example.quiz.User;
 
+import com.example.quiz.User.DTO.UserAccountInfoDTO;
+import com.example.quiz.User.DTO.UserDescriptionChangeRequest;
+import com.example.quiz.User.DTO.UserDescriptionDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
-@RequestMapping("/api/user/demo")
+@RequestMapping("/api/user")
 public class UserController {
-    @GetMapping("/gethello")
-    public ResponseEntity<String> getHello(){
-        return ResponseEntity.ok("Hello");
+    private final UserService user_service;
+    @GetMapping("/get/profile-info/{username}")
+    public ResponseEntity<UserAccountInfoDTO> getAccountInfo(@PathVariable String username){
+        return new ResponseEntity<>(user_service.getAccountInfo(username),HttpStatusCode.valueOf(200));
+    }
+    @PutMapping("/change/description")
+    public ResponseEntity<UserDescriptionDTO> changeDescription(@RequestBody UserDescriptionChangeRequest request){
+        return new ResponseEntity<>(user_service.changeDescription(request),HttpStatusCode.valueOf(200));
     }
 }

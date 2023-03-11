@@ -1,13 +1,12 @@
 package com.example.quiz.Security.Authentication;
 
-import com.example.quiz.Security.Authentication.DTO.AuthenticationRequest;
-import com.example.quiz.Security.Authentication.DTO.AuthenticationResponse;
-import com.example.quiz.Security.Authentication.DTO.RegistrationRequest;
-import com.example.quiz.Security.Authentication.DTO.RegistrationResult;
+import com.example.quiz.Security.Authentication.DTO.*;
 import com.example.quiz.Security.Authentication.Exceptions.EmailTakenException;
+import com.example.quiz.Security.Authentication.Exceptions.InvalidLoginException;
 import com.example.quiz.Security.Authentication.Exceptions.LoginTakenException;
 import com.example.quiz.Security.Authentication.Exceptions.PasswordMissmatchException;
 import com.example.quiz.Security.JWT.JwtService;
+import com.example.quiz.User.DTO.UserAccountInfoDTO;
 import com.example.quiz.User.Role;
 import com.example.quiz.User.User;
 import com.example.quiz.User.UserService;
@@ -69,5 +68,29 @@ public class AuthenticationService {
 
 
         return new AuthenticationResponse( jwt_service.generateToken(user));
+    }
+
+    public EmailChangeResult changePassword(EmailChangeRequest request) {
+        if(user_service.emailExists(request.new_email())) throw new EmailTakenException();//I <3 U
+        User user = user_service.loadUserByUsername(request.username());
+        if(user==null) throw new InvalidLoginException();
+        user.setEmail(request.new_email());
+        user = user_service.saveUser(user);
+        return EmailChangeResult.builder().email(user.getEmail()).build();
+    }
+
+    public LoginChangeResult changeLogin(LoginChangeRequest request) {
+        if(user_service.loginExists(request.new_username())) throw new LoginTakenException();
+        User user = user_service.loadUserByUsername(request.username());
+        if(user==null) throw new InvalidLoginException();
+        user.setLogin(request.new_username());
+        user = user_service.saveUser(user);
+        String token = jwt_service.generateToken(user);
+        return LoginChangeResult.builder()
+                .username(user.getUsername())
+                .token(token)
+                .build();
+
+
     }
 }
