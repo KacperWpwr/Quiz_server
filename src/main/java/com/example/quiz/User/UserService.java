@@ -1,19 +1,23 @@
 package com.example.quiz.User;
 
+import com.example.quiz.Quiz.DTO.QuizInfoDTO;
+import com.example.quiz.Quiz.Quiz;
 import com.example.quiz.Security.Authentication.Exceptions.InvalidLoginException;
-import com.example.quiz.User.DTO.UserAccountInfoDTO;
-import com.example.quiz.User.DTO.UserDescriptionChangeRequest;
-import com.example.quiz.User.DTO.UserDescriptionDTO;
+import com.example.quiz.User.DTO.*;
+import com.example.quiz.User.Exceptions.PageOutOfBoundsException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
-    @Autowired
+    private final Integer QUIZZES_PER_PAGE=7;
+
     private final UserRepository user_repository;
     public boolean emailExists(String email){
         return user_repository.userExistEmail(email);
@@ -37,7 +41,7 @@ public class UserService implements UserDetailsService {
 
     public UserAccountInfoDTO getAccountInfo(String username) {
         User user = user_repository.loadUserByUsername(username);
-        if(user==null) throw new InvalidLoginException();
+        if(user == null) throw new InvalidLoginException();
 
         return UserAccountInfoDTO.builder()
                 .login(username)
@@ -48,7 +52,7 @@ public class UserService implements UserDetailsService {
 
     public UserDescriptionDTO changeDescription(UserDescriptionChangeRequest request) {
         User user = user_repository.loadUserByUsername(request.username());
-        if(user==null) throw new InvalidLoginException();
+        if(user == null) throw new InvalidLoginException();
         user.setDescription(request.new_description());
         user_repository.save(user);
 
@@ -56,5 +60,25 @@ public class UserService implements UserDetailsService {
                 .description(user.getDescription())
                 .build();
 
+    }
+
+    public UserQuizPageNumberDTO getPageNumber(String username) {
+        User user =  user_repository.loadUserByUsername(username);
+        if(user == null) throw new InvalidLoginException();
+
+        Integer pages_num = (int)Math.ceil( user.getQuizNumber().doubleValue() / QUIZZES_PER_PAGE.doubleValue());
+
+        return new UserQuizPageNumberDTO(pages_num);
+    }
+
+    public UserPageContentDTO getPageContext(String username, Integer page_num) {
+        User user =  user_repository.loadUserByUsername(username);
+        if(user == null) throw new InvalidLoginException();
+        Integer pages_num = (int)Math.ceil( user.getQuizNumber().doubleValue() / QUIZZES_PER_PAGE.doubleValue());
+        if(page_num>pages_num) throw new PageOutOfBoundsException();
+        List<Quiz> page_content= user.getPage(page_num,QUIZZES_PER_PAGE);
+        List <QuizInfoDTO> page_info_content = page_content.stream().map(Quiz::createInfoDTO).toList();
+
+        return new UserPageContentDTO(page_info_content);
     }
 }

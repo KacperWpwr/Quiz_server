@@ -83,5 +83,15 @@ public class User implements UserDetails {
         return is_enabled;
     }
 
+    public Integer getQuizNumber() {
+        return user_quizzes.size();
+    }
+
+    public List<Quiz> getPage(Integer page_num, Integer quizzes_per_page) {
+        int begin = page_num*quizzes_per_page- quizzes_per_page;
+        int end = Math.min(page_num * quizzes_per_page, user_quizzes.size());
+        return user_quizzes.subList(begin,end);
+    }
+
 
 }
