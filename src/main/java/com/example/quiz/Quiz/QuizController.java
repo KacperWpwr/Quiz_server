@@ -24,7 +24,7 @@ public class QuizController {
     }
     @GetMapping("/get/id/{id}")
     public QuizDisplayDTO getQuizById(@PathVariable Long id){
-        return quiz_service.getQuizById(id);
+        return quiz_service.getQuizDTOById(id);
     }
 
     @GetMapping("/search/strict/{name}")

@@ -35,18 +35,16 @@ public class Quiz {
     private User creator;
 
     public QuizDisplayDTO createDisplayDTO() {
-        List<QuestionDTO> questionDTOs = new ArrayList<>();
-        questions.forEach(question->{
-            questionDTOs.add(question.createDTO());
-        });
+        List<QuestionDTO> questionDTOs = questions.stream().map(Question::createDTO).toList();
 
-        return QuizDisplayDTO.builder().name(quiz_name).questions(questionDTOs).build();
+
+        return QuizDisplayDTO.builder().name(quiz_name).id(id).questions(questionDTOs).build();
 
     }
     public QuizInfoDTO createInfoDTO(){
         return QuizInfoDTO.builder()
                 .creator_username(creator.getUsername())
-                .quiz_name(quiz_name)
+                .name(quiz_name)
                 .id(id)
                 .question_amount(questions.size())
                 .build();

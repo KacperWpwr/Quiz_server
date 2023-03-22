@@ -1,15 +1,20 @@
 package com.example.quiz.User;
 
 import com.example.quiz.Quiz.Quiz;
+import com.example.quiz.QuizHsitory.QuizRecord;
+import com.example.quiz.User.DTO.CreatorDisplayDTO;
+import com.example.quiz.User.DTO.CreatorInfoDTO;
+import com.example.quiz.User.DTO.UserDisplayDTO;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Entity(name = "User_Account")
 @Table
@@ -42,9 +47,22 @@ public class User implements UserDetails {
             mappedBy = "creator"
     )
     private List<Quiz> user_quizzes;
+    @OneToMany(mappedBy = "user")
+    private List<QuizRecord> quiz_history;
+    @ManyToMany
+    @JoinTable(
+            name="following_table",
+            joinColumns = @JoinColumn(name = "following_id"),
+            inverseJoinColumns = @JoinColumn(name = "followed_id"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"followed_id","following_id"})
+
+    )
+    private List<User> followed_users;
+    @ManyToMany(mappedBy ="followed_users", fetch = FetchType.EAGER)
+    private List<User> following_users;
     //TODO: private VerificationToken verification_token
-    //TODO: private List<User> followed_users
-    //TODO: private List<QuizRecord> quiz_history
+
+
     //TODO: private List<SearchQuery> search_history
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -92,6 +110,61 @@ public class User implements UserDetails {
         int end = Math.min(page_num * quizzes_per_page, user_quizzes.size());
         return user_quizzes.subList(begin,end);
     }
+    public void addQuizRecord(QuizRecord record){
+        if(quiz_history.size()==100){
+            quiz_history.remove(0);
+        }
+        quiz_history.add(record);
+    }
+    public UserDisplayDTO getDisplayDTO(){
+        return new UserDisplayDTO(login);
+    }
+    public CreatorDisplayDTO getCreatorDisplayDTO(){
+        return CreatorDisplayDTO.builder()
+                .username(login)
+                .description(description)
+                .quiz_num(user_quizzes.size())
+                .rating(0.0)
+                .build();
+    }
+    public CreatorInfoDTO getCreatorInfoDTO(){
+        return CreatorInfoDTO.builder()
+                .username(login)
+                .quiz_num(user_quizzes.size())
+                .rating(0.0)
+                .build();
+    }
+    public List<UserDisplayDTO> addFollowedCreator(User user){
+        if(!followed_users.contains(user)){
+            followed_users.add(user);
+        }
+        return followed_users.stream().map(User::getDisplayDTO).toList();
+    }
+    public List<UserDisplayDTO> addFollowingUsers(User user){
+        if(!following_users.contains(user)){
+            following_users.add(user);
+        }
+        return following_users.stream().map(User::getDisplayDTO).toList();
+    }
+    public List<UserDisplayDTO> removeFollowedCreator(User user){
+        followed_users = followed_users.stream().filter(user1 -> user1.id != user.id).collect(Collectors.toList());
+        return followed_users.stream().map(User::getDisplayDTO).toList();
+    }
+    public List<UserDisplayDTO> removeFollowingUsers(User user){
+        following_users = following_users.stream().filter(user1 -> user1.id != user.id).collect(Collectors.toList());
+        return following_users.stream().map(User::getDisplayDTO).toList();
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id.equals(user.id);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

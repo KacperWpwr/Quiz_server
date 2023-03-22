@@ -9,6 +9,4 @@ import java.util.List;
 
 @Repository
 public interface QuizRepository extends JpaRepository<Quiz,Long> {
-    @Query("select quiz from Quiz as quiz where quiz.quiz_name like %:name%")
-    List<Quiz> getQuizByNameStrict(@Param("name") String name);
 }

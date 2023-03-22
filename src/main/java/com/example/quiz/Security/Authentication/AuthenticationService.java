@@ -5,8 +5,7 @@ import com.example.quiz.Security.Authentication.Exceptions.EmailTakenException;
 import com.example.quiz.Security.Authentication.Exceptions.InvalidLoginException;
 import com.example.quiz.Security.Authentication.Exceptions.LoginTakenException;
 import com.example.quiz.Security.Authentication.Exceptions.PasswordMissmatchException;
-import com.example.quiz.Security.JWT.JwtService;
-import com.example.quiz.User.DTO.UserAccountInfoDTO;
+import com.example.quiz.Security.Configuration.JWT.JwtService;
 import com.example.quiz.User.Role;
 import com.example.quiz.User.User;
 import com.example.quiz.User.UserService;
@@ -15,8 +14,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

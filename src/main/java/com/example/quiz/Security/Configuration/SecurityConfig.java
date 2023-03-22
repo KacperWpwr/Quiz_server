@@ -2,9 +2,8 @@ package com.example.quiz.Security.Configuration;
 
 import com.example.quiz.Security.Authentication.Exceptions.InvalidLoginException;
 import com.example.quiz.Security.Authentication.Exceptions.InvalidPasswordException;
-import com.example.quiz.Security.JWT.JwtAuthenticationFilter;
+import com.example.quiz.Security.Configuration.JWT.JwtAuthenticationFilter;
 import com.example.quiz.User.UserService;
-import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,8 +28,6 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -48,7 +45,9 @@ public class SecurityConfig {
         http.cors().and()
                 .csrf().disable()
                 .authorizeHttpRequests(authorize-> authorize
-                        .requestMatchers("/api/user/auth/**","/api/quiz/get/**","/api/quiz/search/**").permitAll()
+                        .requestMatchers("/api/user/auth/**","/api/user/search/**",
+                                "/api/quiz/get/**","/api/quiz/search/**",
+                                "/api/user/get/creator/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authenticationProvider(getAuthenticationProvider())

@@ -1,4 +1,4 @@
-package com.example.quiz.Security.JWT;
+package com.example.quiz.Security.Configuration.JWT;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

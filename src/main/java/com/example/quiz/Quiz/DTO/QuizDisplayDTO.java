@@ -5,5 +5,5 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record QuizDisplayDTO(String name, List<QuestionDTO> questions) {
+public record QuizDisplayDTO(Long id,String name, List<QuestionDTO> questions) {
 }

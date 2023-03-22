@@ -1,4 +1,4 @@
-package com.example.quiz.Security.JWT;
+package com.example.quiz.Security.Configuration.JWT;
 
 import com.example.quiz.User.User;
 import com.example.quiz.User.UserService;
@@ -9,8 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -48,8 +46,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request,response);
             return;
         }
+
         User user = this.userService.loadUserByUsername(username);
+        if(user==null){
+            filterChain.doFilter(request,response);
+            return;
+        }
         if (!jwtService.validateToken(jwt,user)){
+
             filterChain.doFilter(request,response);
             return;
         }

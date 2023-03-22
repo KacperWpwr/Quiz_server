@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,15 +33,12 @@ public class QuizService {
     private final UserService user_service;
 
     public  List<QuizInfoDTO> strictNameSearch(String name) {
-        List<Quiz> quizzes = quiz_repository.getQuizByNameStrict(name);
-        if(quizzes==null){
-            return null;
-        }
-        List<QuizInfoDTO> return_list= new ArrayList<>();
+        List<Quiz> quizzes = quiz_repository.findAll();
 
-        quizzes.forEach(quiz->{
-            return_list.add(quiz.createInfoDTO());
-        });
+        List<QuizInfoDTO> return_list = quizzes.stream().filter(quiz -> quiz.getQuiz_name().contains(name))
+                .map(Quiz::createInfoDTO).toList();
+
+
         if(return_list.size()<=20){
             return return_list;
         }else{
@@ -77,8 +73,11 @@ public class QuizService {
         return quiz_repository.save(quiz).createDisplayDTO();
 
     }
-    public QuizDisplayDTO getQuizById(Long id){
+    public QuizDisplayDTO getQuizDTOById(Long id){
         return quiz_repository.findById(id).orElseThrow().createDisplayDTO();
+    }
+    public Quiz getQuizById(Long id){
+        return quiz_repository.findById(id).orElseThrow();
     }
     public List<QuizInfoDTO> advancedSearch(String query){
         List<Quiz> quizzes= quiz_repository.findAll();
