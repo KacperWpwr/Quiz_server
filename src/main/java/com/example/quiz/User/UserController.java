@@ -1,5 +1,6 @@
 package com.example.quiz.User;
 
+import com.example.quiz.Quiz.Wrappers.QuizDTOList;
 import com.example.quiz.QuizHsitory.DTO.QuizHistoryDTO;
 import com.example.quiz.User.DTO.*;
 import lombok.RequiredArgsConstructor;
@@ -79,8 +80,16 @@ public class UserController {
         return new ResponseEntity<>(user_service.unfollowCreator(request),HttpStatusCode.valueOf(200));
     }
     @GetMapping("/{username}/recent-quizzes")
-    public ResponseEntity<QuizHistoryDTO> getRecentQuizzes(@PathVariable String username){
-        return new ResponseEntity<>(new QuizHistoryDTO(user_service.getRecentQuizzes(username)),HttpStatusCode.valueOf(200));
+    public ResponseEntity<QuizDTOList> getRecentQuizzes(@PathVariable String username){
+        return new ResponseEntity<>(user_service.getRecentQuizzes(username),HttpStatusCode.valueOf(200));
+    }
+    @GetMapping("/{username}/given-opinion")
+    public ResponseEntity<Boolean> hasGivenOpinion(@PathVariable String username, @RequestParam(name = "quiz") Long quiz_id){
+        return new ResponseEntity<>(user_service.hasGivenOpinion(username,quiz_id),HttpStatusCode.valueOf(200));
+    }
+    @GetMapping("/{username}/proposed-quizzes")
+    public ResponseEntity<QuizDTOList> getProposedQuizzes(@PathVariable String username){
+        return new ResponseEntity<>(user_service.getProposedQuizzes(username),HttpStatusCode.valueOf(200));
     }
 
 

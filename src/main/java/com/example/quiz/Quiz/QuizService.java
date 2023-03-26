@@ -6,6 +6,7 @@ import com.example.quiz.Quiz.DTO.QuizDisplayDTO;
 import com.example.quiz.Quiz.DTO.QuizInfoDTO;
 import com.example.quiz.Quiz.Question.Question;
 import com.example.quiz.Quiz.Question.QuestionService;
+import com.example.quiz.Rating.DTO.RatingDisplayDTO;
 import com.example.quiz.User.User;
 import com.example.quiz.User.UserService;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class QuizService {
+
+
+
     @Getter
     @AllArgsConstructor
     private class QueryMatch{
@@ -101,5 +105,12 @@ public class QuizService {
         Collections.sort(matches, (o1, o2) -> Integer.compare(o2.match,o1.match));
 
         return matches.stream().map(match-> quiz_repository.findById(match.id).get().createInfoDTO()).collect(Collectors.toList());
+    }
+    public Quiz saveQuiz(Quiz quiz) {
+        return quiz_repository.save(quiz);
+    }
+    public List<RatingDisplayDTO> getQuizRatings(Long quiz_id) {
+        Quiz quiz = quiz_repository.findById(quiz_id).orElseThrow();
+        return quiz.getQuizRatings();
     }
 }

@@ -2,6 +2,7 @@ package com.example.quiz.User;
 
 import com.example.quiz.Quiz.Quiz;
 import com.example.quiz.QuizHsitory.QuizRecord;
+import com.example.quiz.Rating.Rating;
 import com.example.quiz.User.DTO.CreatorDisplayDTO;
 import com.example.quiz.User.DTO.CreatorInfoDTO;
 import com.example.quiz.User.DTO.UserDisplayDTO;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity(name = "User_Account")
@@ -60,10 +62,11 @@ public class User implements UserDetails {
     private List<User> followed_users;
     @ManyToMany(mappedBy ="followed_users", fetch = FetchType.EAGER)
     private List<User> following_users;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Rating> user_ratings;
     //TODO: private VerificationToken verification_token
-
-
-    //TODO: private List<SearchQuery> search_history
+    private Double creator_rating =0.0;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
@@ -124,14 +127,14 @@ public class User implements UserDetails {
                 .username(login)
                 .description(description)
                 .quiz_num(user_quizzes.size())
-                .rating(0.0)
+                .rating(creator_rating)
                 .build();
     }
     public CreatorInfoDTO getCreatorInfoDTO(){
         return CreatorInfoDTO.builder()
                 .username(login)
                 .quiz_num(user_quizzes.size())
-                .rating(0.0)
+                .rating(creator_rating)
                 .build();
     }
     public List<UserDisplayDTO> addFollowedCreator(User user){
@@ -166,5 +169,24 @@ public class User implements UserDetails {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public void addRating(Rating rating){
+        user_ratings.add(rating);
+    }
+    public void calcRating(){
+        Double sum =0.0;
+        int valid_ratings_number =0;
+        for(Quiz quiz : user_quizzes){
+            if(quiz.getOverall_rating()!=0.0){
+                sum+=quiz.getOverall_rating();
+                valid_ratings_number++;
+            }
+        }
+        if(valid_ratings_number != 0){
+            creator_rating = sum/valid_ratings_number;
+        }else{
+            creator_rating= 0.0;
+        }
     }
 }

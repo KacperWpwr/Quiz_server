@@ -2,8 +2,11 @@ package com.example.quiz.User;
 
 import com.example.quiz.Quiz.DTO.QuizInfoDTO;
 import com.example.quiz.Quiz.Quiz;
+import com.example.quiz.Quiz.Wrappers.QuizDTOList;
+import com.example.quiz.QuizHsitory.DTO.QuizHistoryDTO;
 import com.example.quiz.QuizHsitory.DTO.QuizRecordDTO;
 import com.example.quiz.QuizHsitory.QuizRecord;
+import com.example.quiz.Rating.Rating;
 import com.example.quiz.Security.Authentication.Exceptions.InvalidLoginException;
 import com.example.quiz.User.DTO.*;
 import com.example.quiz.User.Exceptions.PageOutOfBoundsException;
@@ -19,6 +22,8 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class UserService implements UserDetailsService {
+
+
 
     @Getter
     @AllArgsConstructor
@@ -64,6 +69,7 @@ public class UserService implements UserDetailsService {
     public UserDescriptionDTO changeDescription(UserDescriptionChangeRequest request) {
         User user = user_repository.loadUserByUsername(request.username());
         if(user == null) throw new InvalidLoginException();
+
         user.setDescription(request.new_description());
         user_repository.save(user);
 
@@ -85,8 +91,10 @@ public class UserService implements UserDetailsService {
     public UserPageContentDTO getPageContext(String username, Integer page_num) {
         User user =  user_repository.loadUserByUsername(username);
         if(user == null) throw new InvalidLoginException();
+
         Integer pages_num = (int)Math.ceil( user.getQuizNumber().doubleValue() / QUIZZES_PER_PAGE.doubleValue());
         if(page_num>pages_num) throw new PageOutOfBoundsException();
+
         List<Quiz> page_content= user.getPage(page_num,QUIZZES_PER_PAGE);
         List <QuizInfoDTO> page_info_content = page_content.stream().map(Quiz::createInfoDTO).toList();
 
@@ -98,15 +106,16 @@ public class UserService implements UserDetailsService {
         if(user == null) throw new InvalidLoginException();
         return user.getQuiz_history().stream().map(QuizRecord::getDTO).toList();
     }
-    public List<QuizRecordDTO> getRecentQuizzes(String username) {
+    public QuizDTOList getRecentQuizzes(String username) {
         User user = user_repository.loadUserByUsername(username);
         if (user == null) throw new InvalidLoginException();
+
         Set<QuizRecord> recent_quizzes= new HashSet<>(user.getQuiz_history());
 
         if(recent_quizzes.size()>20){
-            return recent_quizzes.stream().map(QuizRecord::getDTO).toList().subList(0,20);
+            return new QuizDTOList(recent_quizzes.stream().map(QuizRecord::getQuizInfoDTO).toList().subList(0,20));
         }else{
-            return recent_quizzes.stream().map(QuizRecord::getDTO).toList();
+            return new QuizDTOList(recent_quizzes.stream().map(QuizRecord::getQuizInfoDTO).toList());
         }
     }
 
@@ -139,6 +148,7 @@ public class UserService implements UserDetailsService {
     public UserQuizDTO getUserQuizzes(String username){
         User user = user_repository.loadUserByUsername(username);
         if(user==null) throw new InvalidLoginException();
+
         List<QuizInfoDTO> return_list = user.getUser_quizzes().stream()
                 .map(Quiz::createInfoDTO).collect(Collectors.toList());
         Collections.reverse(return_list);
@@ -164,18 +174,15 @@ public class UserService implements UserDetailsService {
 
         if(user==null) throw new InvalidLoginException();
 
-        return CreatorDisplayDTO.builder()
-                .rating(0.0)
-                .quiz_num(user.getQuizNumber())
-                .description(user.getDescription())
-                .username(user.getUsername())
-                .build();
+        return user.getCreatorDisplayDTO();
     }
     public UserFollowedDTO followCreator(FollowUserRequest request){
         User user = user_repository.loadUserByUsername(request.following_username());
         if(user==null) throw new InvalidLoginException();
+
         User followed_user =user_repository.loadUserByUsername(request.followed_username());
         if(followed_user==null) throw new InvalidLoginException();
+
         user.addFollowedCreator(followed_user);
         followed_user.addFollowingUsers(user);
         user = user_repository.save(user);
@@ -192,6 +199,7 @@ public class UserService implements UserDetailsService {
     public Boolean isFollowing(String username_followed,String username_following){
         User following = user_repository.loadUserByUsername(username_following);
         if(following==null) throw new InvalidLoginException();
+
         User followed = user_repository.loadUserByUsername(username_followed);
         if(followed==null) throw new InvalidLoginException();
 
@@ -200,14 +208,45 @@ public class UserService implements UserDetailsService {
     public UserFollowedDTO unfollowCreator(FollowUserRequest request){
         User user = user_repository.loadUserByUsername(request.following_username());
         if(user==null) throw new InvalidLoginException();
+
         User followed_user =user_repository.loadUserByUsername(request.followed_username());
         if(followed_user==null) throw new InvalidLoginException();
+
         user.removeFollowedCreator(followed_user);
         followed_user.removeFollowingUsers(user);
         user = user_repository.save(user);
         user_repository.save(followed_user);
 
         return new UserFollowedDTO(user.getFollowed_users().stream().map(User::getCreatorInfoDTO).toList());
+    }
+    public Boolean hasGivenOpinion(String username, Long quiz_id) {
+        User user = user_repository.loadUserByUsername(username);
+        if(user == null) throw new InvalidLoginException();
+
+        Set<Rating> user_ratings = user.getUser_ratings();
+
+        return user_ratings.stream().filter(
+                rating->rating.getQuiz().getId().equals(quiz_id)&&
+                rating.getUser().getUsername().equals(username)).toList().size()>0;
+    }
+
+    public QuizDTOList getProposedQuizzes(String username){
+        User user = user_repository.loadUserByUsername(username);
+        if(user == null) throw new InvalidLoginException();
+
+        List<User> creators = user.getFollowed_users();
+        List<Quiz> quizzes = new ArrayList<>();
+        for(User creator : creators){
+            quizzes.addAll(creator.getUser_quizzes());
+        }
+
+        quizzes.sort((o1, o2) -> o1.getOverall_rating().compareTo(o2.getOverall_rating()));
+
+        if(quizzes.size()<=20){
+            return new QuizDTOList(quizzes.stream().map(Quiz::createInfoDTO).toList());
+        }else{
+            return new QuizDTOList(quizzes.subList(0,19).stream().map(Quiz::createInfoDTO).toList());
+        }
     }
 
 }

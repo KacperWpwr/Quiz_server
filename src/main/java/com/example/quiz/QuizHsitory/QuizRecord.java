@@ -1,6 +1,7 @@
 package com.example.quiz.QuizHsitory;
 
 
+import com.example.quiz.Quiz.DTO.QuizInfoDTO;
 import com.example.quiz.Quiz.Quiz;
 import com.example.quiz.QuizHsitory.DTO.QuizRecordDTO;
 import com.example.quiz.User.User;
@@ -35,7 +36,10 @@ public class QuizRecord {
     private Date date;
 
     public QuizRecordDTO getDTO(){
-        return new QuizRecordDTO(date, quiz.getQuiz_name());
+        return new QuizRecordDTO(date, quiz.getQuiz_name(),quiz.getCreator().getUsername(),quiz.getQuestions().size());
+    }
+    public QuizInfoDTO getQuizInfoDTO(){
+        return  quiz.createInfoDTO();
     }
 
     @Override
