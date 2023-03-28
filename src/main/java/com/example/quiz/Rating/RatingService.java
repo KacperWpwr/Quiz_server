@@ -4,7 +4,6 @@ package com.example.quiz.Rating;
 import com.example.quiz.Quiz.Quiz;
 import com.example.quiz.Quiz.QuizService;
 import com.example.quiz.Rating.DTO.AddRatingRequest;
-import com.example.quiz.Rating.DTO.RatingDisplayDTO;
 import com.example.quiz.Security.Authentication.Exceptions.InvalidLoginException;
 import com.example.quiz.User.User;
 import com.example.quiz.User.UserService;
