@@ -17,7 +17,6 @@ public class QuizRecordService {
     private final QuizService quiz_service;
     public boolean addQuizRecordToUser(AddQuizRecordRequest request){
         User user = user_service.loadUserByUsername(request.username());
-        System.out.println("USername: "+request.username());
         if(user == null) throw new InvalidLoginException();
         Quiz quiz = quiz_service.getQuizById(request.quiz_id());
         QuizRecord new_record = QuizRecord.builder()

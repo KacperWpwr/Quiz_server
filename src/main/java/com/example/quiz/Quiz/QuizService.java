@@ -86,9 +86,7 @@ public class QuizService {
     public List<QuizInfoDTO> advancedSearch(String query){
         List<Quiz> quizzes= quiz_repository.findAll();
         String[] sub_queries=query.toLowerCase().split("[ ,.]");
-        for (int i = 0; i < sub_queries.length; i++) {
-            System.out.println(sub_queries[i]);
-        }
+
         List<QueryMatch> matches = new ArrayList<>();
         quizzes.forEach(quiz->{
             int match_level=0;
